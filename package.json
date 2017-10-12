@@ -12,6 +12,7 @@
     "hoist-non-react-statics": "^1.2.0",
     "react": "16.0.0-alpha.6",
     "react-native": "0.43.4",
+    "react-native-expanding-circle-transition": "^1.2.3",
     "react-navigation": "1.0.0-beta.9",
     "react-relay": "1.0.0-rc.3"
   },

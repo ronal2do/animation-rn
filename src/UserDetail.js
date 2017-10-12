@@ -1,7 +1,9 @@
 // @flow
 
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button, Easing} from 'react-native';
+import { withNavigation } from 'react-navigation';
+import CircleTransition from 'react-native-expanding-circle-transition'
 
 import {
   graphql,
@@ -16,19 +18,69 @@ type Props = {
   query: UserDetail_query,
 };
 
+const POSITON = 'custom'
+
+@withNavigation
 class UserDetail extends Component<void, Props, any> {
+
   static navigationOptions = {
-    title: 'UserDetail',
+    headerTitle: 'black',
+    headerBackTitle: 'ddd',
+
   };
+
+  state = { 
+    visible: true,
+    pressLocationX: 0,
+    pressLocationY: 0,
+  }
+
+  componentDidMount() {
+    this.setState({ visible: true })
+  }
+
+  back = (event) => {
+    this.setState({ visible: false })
+    const {goBack} = this.props.navigation;
+    let pressLocationX = event.nativeEvent.locationX
+    let pressLocationY = event.nativeEvent.locationY
+    this.setState({
+      customLeftMargin: pressLocationX,
+      customTopMargin: pressLocationY
+    },this.circleTransition.start(() => goBack(null)))
+  }
 
   render() {
     const { user } = this.props.query;
-
+    const {goBack} = this.props.navigation;
+    const { visible, customLeftMargin, customTopMargin } = this.state;
     return (
-      <View style={styles.container}>
-        <Text>ID: {user.id}</Text>
-        <Text>Name: {user.name}</Text>
-        <Text>Email: {user.email}</Text>
+      <View style={[styles.container, { backgroundColor: visible ? '#29C5DB' : 'white' } ]}>
+       { visible &&
+          <View>
+            <View style={{ height: 80, alignItems: 'flex-start', justifyContent: 'center' }}>
+           <Button
+              onPress={(event) => this.back(event)}
+              title="< Go back"
+            />
+            </View>
+            <View style={styles.container}>
+              <Text>ID: {user.id}</Text>
+              <Text>Name: {user.name}</Text>
+              <Text>Email: {user.email}</Text>
+            </View> 
+          </View>
+       }
+        <CircleTransition
+          ref={(circle) => { this.circleTransition = circle }}
+          color={'#29C5DB'}
+          expand={false}
+          duration={300}
+          customTopMargin={customTopMargin}
+          customLeftMargin={customLeftMargin}
+          easing={Easing.linear}
+          position={POSITON}
+        />
       </View>
     );
   }
@@ -77,6 +129,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#29C5DB',
   },
 });
 
